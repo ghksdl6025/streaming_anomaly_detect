@@ -110,7 +110,7 @@ class prefix_bin:
 
         Parameters
         ----------
-        pred: value 
+        pred: tuple
         '''
         # self.predicted[pred[0]] = pred[1]
         self.predicted[pred[0]]=pred[1]

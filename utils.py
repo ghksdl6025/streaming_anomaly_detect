@@ -192,8 +192,8 @@ def readjustment_training(dataset, feature_matrix):
     dataset: dictionary
         Dictionary of encoded event
 
-    feature_matrix: dictinoary
-        Dictionary of extracted feature matrix
+    feature_matrix: list
+        List of feature matrix for specific prefix length
 
     Return
     ----------
