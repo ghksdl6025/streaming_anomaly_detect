@@ -2,7 +2,27 @@ import pandas as pd
 from river import tree
 import datetime
 
-df = pd.read_csv('./bpic17_length28.csv')
+df = pd.read_csv('./bpic17_sampling2.csv')
+
+df = df.loc[:,['Case ID', 'Activity', 'Resource', 'Start Timestamp']]
+df = df.rename({'Case ID':'caseid','Activity':'activity','Resource':'resource', 'Start Timestamp': 'ts'}, axis=1)
+df = df.sort_values(by='ts')
+
+groups = df.groupby('caseid')
+
+concating = []
+for _, group in groups:
+    group = group.reset_index(drop=True)
+    finish_tag = 'Finish'
+    group_len = len(group['activity'])
+    group.loc[group_len-1, 'progress'] = finish_tag
+    concating.append(group)
+
+pd_concat = pd.concat(concating)
+pd_concat.sort_values(by='ts')
+print(pd_concat.head)
+df = pd_concat
+
 df['ts'] =  pd.to_datetime(df['ts'])
 
 
@@ -27,22 +47,4 @@ for _, group in groups:
     if endidk +1 != len(actlist):
         print(group)
 df = df.drop(['progress'], axis=1)
-df.to_csv('./bpic17_length28.csv',index=False)
-# df = df_original.loc[:,['Case ID', 'Activity', 'Resource', 'Start Timestamp']]
-# df = df.rename({'Case ID':'caseid','Activity':'activity','Resource':'resource', 'Start Timestamp': 'ts'}, axis=1)
-# df = df.sort_values(by='ts')
-
-# groups = df.groupby('caseid')
-
-# concating = []
-# for _, group in groups:
-#     group = group.reset_index(drop=True)
-#     finish_tag = 'Finish'
-#     group_len = len(group['activity'])
-#     group.loc[group_len-1, 'progress'] = finish_tag
-#     concating.append(group)
-
-# pd_concat = pd.concat(concating)
-# pd_concat.sort_values(by='ts')
-# print(pd_concat.head)
-# pd_concat.to_csv('./bpic17_length28.csv',index=False)
+df.to_csv('./bpic17_sampling2.csv',index=False)
