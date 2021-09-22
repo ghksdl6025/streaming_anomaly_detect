@@ -2,7 +2,7 @@ import pandas as pd
 from river import tree
 import datetime
 
-df = pd.read_csv('./bpic17_sampling2.csv')
+df = pd.read_csv('./bpic17_sampling3.csv')
 
 df = df.loc[:,['Case ID', 'Activity', 'Resource', 'Start Timestamp']]
 df = df.rename({'Case ID':'caseid','Activity':'activity','Resource':'resource', 'Start Timestamp': 'ts'}, axis=1)
@@ -47,4 +47,4 @@ for _, group in groups:
     if endidk +1 != len(actlist):
         print(group)
 df = df.drop(['progress'], axis=1)
-df.to_csv('./bpic17_sampling2.csv',index=False)
+df.to_csv('./bpic17_sampling3.csv',index=False)
