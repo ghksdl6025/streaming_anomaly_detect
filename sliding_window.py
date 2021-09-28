@@ -10,9 +10,18 @@ from collections import deque
 import pandas as pd
 
 class training_window:
-    def __init__(self, window_size):
+    def __init__(self, window_size, retraining):
         self.container = deque()
         self.window_size = window_size
+        self.retraining = retraining
+        self.retraining_count = 0
+
+        if retraining > window_size:
+            raise ValueError
+
+    def reset_retraining_count(self):
+        if self.retraining_count == self.retraining:
+            self.retraining_count =0
 
     def update_window(self, new_case):
         '''
@@ -25,6 +34,7 @@ class training_window:
             value: Encoded events
         '''
         self.container.append(new_case)
+        self.retraining_count +=1
 
         if len(self.container) > self.window_size:
             self.container.popleft()
