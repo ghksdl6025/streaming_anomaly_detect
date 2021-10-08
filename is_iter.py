@@ -17,7 +17,7 @@ import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 importlib.reload(sliding_window)
 
-file_name = './data/loan_baseline.pnml_noise_0.125_iteration_1_seed_27126_sample.csv'
+file_name = './data/loan_baseline.pnml_noise_0.15_iteration_1_seed_614_sample.csv'
 contamination = 0.25
 
 dataset = stream.iter_csv(
