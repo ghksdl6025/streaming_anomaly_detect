@@ -1,15 +1,14 @@
 import pandas as pd
-from river import stream,tree,metrics
+from river import stream
 import utils
 from encoding import prefix_bin
 import numpy as np
 from sklearn.metrics import classification_report, accuracy_score
-import os
+
 from tqdm import tqdm
 import sliding_window
-from sklearn.ensemble import RandomForestClassifier, IsolationForest
+from sklearn.ensemble import IsolationForest
 
-from sklearn.tree import DecisionTreeClassifier
 import datetime, time
 import importlib
 
@@ -17,7 +16,9 @@ import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 importlib.reload(sliding_window)
 
-file_name = './data/loan_baseline.pnml_noise_0.15_iteration_1_seed_614_sample.csv'
+
+file_name = './data/loan_baseline.pnml_noise_0.024999999999999998_iteration_1_seed_68964_sample.csv'
+
 contamination = 0.25
 
 dataset = stream.iter_csv(
@@ -54,7 +55,7 @@ graceperiod_finish=0
 finishedcases = set()
 
 # Sliding window for training setting
-window_size = 50
+window_size = 30
 retraining_size = 10
 training_window = sliding_window.training_window(window_size,retraining_size)
 
@@ -257,7 +258,8 @@ saving_data = {'y_true':global_true, 'y_pred':global_pred}
 import pickle
 saving_file_name = file_name.split('/')[-1][:-4]
 
-with open('./result/iso_cont%s_%s.pkl'%(contamination, saving_file_name), 'wb') as fp:
+
+with open('./result/iso_cont%s_window%s_%s.pkl'%(contamination, window_size, saving_file_name), 'wb') as fp:
     pickle.dump(saving_data, fp)
 #     print(caseid, len(true_label_list), len(prediction_list))
 
