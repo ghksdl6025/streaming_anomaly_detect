@@ -23,8 +23,8 @@ with torch.no_grad():
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-window_size = 50
-retraining_size = 10
+window_size = 30
+retraining_size = 6
 
 for file_name in [
     './data/loan_baseline.pnml_noise_0.15_iteration_1_seed_614_sample.csv',
@@ -179,7 +179,7 @@ for file_name in [
             optimizer.zero_grad()
 
             previous_model =0
-            for i in range(30):
+            for i in range(10):
                 running_loss =0
                 for pos, x2 in enumerate(train_x):
                     x_tensor = torch.unsqueeze(x2, dim=0).cuda()
@@ -197,7 +197,7 @@ for file_name in [
                 else:
                     if running_loss > np.mean(loss_list):
                         break
-
+                    
                 loss_list.append(running_loss)
                 previous_model = model
                 
