@@ -14,11 +14,14 @@ import importlib
 
 import warnings
 
-from playsound import playsound
+
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 importlib.reload(sliding_window)
 
 contamination = 0.25
+window_size = 30
+retraining_size = 6
+
 
 for file_name in [
     './data/loan_baseline.pnml_noise_0.15_iteration_1_seed_614_sample.csv',
@@ -65,8 +68,7 @@ for file_name in [
     finishedcases = set()
 
     # Sliding window for training setting
-    window_size = 100
-    retraining_size = 20
+
     training_window = sliding_window.training_window(window_size,retraining_size)
 
     def display_progress(row_counting, total_length, interval=500):
@@ -271,5 +273,3 @@ for file_name in [
 
     with open('./result/lof_cont%s_window%s_%s.pkl'%(contamination, window_size, saving_file_name), 'wb') as fp:
         pickle.dump(saving_data, fp)
-
-playsound('../../Yattong edited version.mp3')

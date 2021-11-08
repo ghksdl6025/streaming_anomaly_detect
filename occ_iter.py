@@ -13,9 +13,9 @@ import datetime, time
 import importlib
 importlib.reload(sliding_window)
 
-contamination = 0.25
-window_size = 100
-retraining_size = 20
+contamination = 0.01
+window_size = 30
+retraining_size = 6
 
 for file_name in [
     './data/loan_baseline.pnml_noise_0.15_iteration_1_seed_614_sample.csv',
@@ -264,6 +264,6 @@ for file_name in [
     saving_file_name = file_name.split('/')[-1][:-4]
 
 
-    with open('./result/occ_cont%s_window%s_%s.pkl'%(contamination, window_size, saving_file_name), 'wb') as fp:
+    with open('./result/ocsvm_cont%s_window%s_%s.pkl'%(contamination, window_size, saving_file_name), 'wb') as fp:
         pickle.dump(saving_data, fp)
 

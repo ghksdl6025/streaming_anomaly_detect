@@ -1,19 +1,23 @@
 import pandas as pd
 
-df = pd.read_csv('./data/loan_baseline.pnml_noise_0.15_iteration_1_seed_614_simple.csv')
+df = pd.read_csv('./data/loan_baseline.pnml_noise_0.0_iteration_1_seed_98070_sample.csv')
 
 groups = df.groupby('Case ID')
 
-first_event = {}
-total_e = 0
+concating = []
 for _, group in groups:
-    first_e = list(group['Activity'])[1]
-    total_e+=1
-    if first_e not in list(first_event.keys()):
-        first_event[first_e]= 1
-    else:
-        first_event[first_e] += 1
+    group = group.reset_index(drop=True)
+    start_activity ='Start'
+    cid = _
+    start_ts = list(group['Complete Timestamp'])[0]
+    start_variant = list(group['Variant'])[0]
+    start_variantidx = list(group['Variant index'])[0]
+    start_lifecyle = 'Start'
 
-for t in first_event:
-    print(t, 100 * first_event[t]/total_e)
-# print(first_event)
+    group.loc[-1] = [_, start_activity, start_ts, start_variant, start_variantidx, start_lifecyle]
+    group.index +=1
+    group = group.sort_index()
+    concating.append(group)
+
+dfk = pd.concat(concating).sort_values(by='Complete Timestamp')
+dfk.to_csv('./data/loan_baseline.pnml_noise_0.0_iteration_1_seed_98070_sample.csv', index=False)
