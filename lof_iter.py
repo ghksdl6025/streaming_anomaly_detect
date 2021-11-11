@@ -1,13 +1,17 @@
 import pandas as pd
-from river import stream
+from river import stream,tree,metrics
 import utils
 from encoding import prefix_bin
 import numpy as np
 from sklearn.metrics import classification_report, accuracy_score
-
+import os
 from tqdm import tqdm
 import sliding_window
-from sklearn.ensemble import IsolationForest
+from sklearn.neighbors import LocalOutlierFactor
+
+import datetime, time
+import importlib
+importlib.reload(sliding_window)
 
 import datetime, time
 import importlib
@@ -19,8 +23,8 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 importlib.reload(sliding_window)
 
 contamination = 0.25
-window_size = 30
-retraining_size = 6
+window_size = 100
+retraining_size = 20
 
 
 for file_name in [
@@ -90,13 +94,15 @@ for file_name in [
         '''
         pw_window = window.prefix_wise_window()
         for x in pw_window:
-            clf  = IsolationForest(max_samples='auto', contamination=contamination)
-            
-            clf.fit(pw_window[x][0])
-            if 'detector_%s'%(x) not in training_models:
-                training_models['detector_%s'%(x)] =[0,0]
-            training_models['detector_%s'%(x)][0] += 1
-            training_models['detector_%s'%(x)][1] = clf
+            clf  = LocalOutlierFactor(contamination= contamination, novelty=True)
+            try:
+                clf.fit(pw_window[x][0])
+                if 'detector_%s'%(x) not in training_models:
+                    training_models['detector_%s'%(x)] =[0,0]
+                training_models['detector_%s'%(x)][0] += 1
+                training_models['detector_%s'%(x)][1] = clf
+            except:
+                pass
         return training_models
 
     def predict_activity_proba(last_event):
@@ -181,7 +187,10 @@ for file_name in [
                 feature_matrix = prefix_wise_window['window_%s'%(last_event.prefix_length)][0].columns.values
                 current_event = utils.readjustment_training(last_event.encoded, feature_matrix)
                 current_event = pd.Series(current_event).to_frame().T
-                prediction = [training_models['detector_window_%s'%(last_event.prefix_length)][1].predict(current_event)]
+                try:
+                    prediction = [training_models['detector_window_%s'%(last_event.prefix_length)][1].predict(current_event)]
+                except:
+                    prediction = 'Not Available'
                 modelid = training_models['detector_window_%s'%(last_event.prefix_length)][0]
         case_bin.update_prediction((modelid, (prediction,ts)))        
                 
@@ -209,7 +218,10 @@ for file_name in [
                         feature_matrix = prefix_wise_window['window_%s'%(last_event.prefix_length)][0].columns.values
                         current_event = utils.readjustment_training(last_event.encoded, feature_matrix)
                         current_event = pd.Series(current_event).to_frame().T
-                        prediction = [training_models['detector_window_%s'%(last_event.prefix_length)][1].predict(current_event)]
+                        try:
+                            prediction = [training_models['detector_window_%s'%(last_event.prefix_length)][1].predict(current_event)]
+                        except:
+                            prediction = 'Not Available'
                         modelid = training_models['detector_window_%s'%(last_event.prefix_length)][0]
                 case_dict[x][-1].update_prediction((modelid, (prediction,ts)))        
             training_window.reset_retraining_count()
