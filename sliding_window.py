@@ -15,6 +15,7 @@ class training_window:
         self.window_size = window_size
         self.retraining = retraining
         self.retraining_count = 0
+        
 
         if retraining > window_size:
             raise ValueError

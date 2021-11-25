@@ -22,9 +22,7 @@ import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 importlib.reload(sliding_window)
 
-contamination = 0.25
-window_size = 100
-retraining_size = 20
+contamination = 0.01
 
 
 for file_name in [
@@ -35,6 +33,8 @@ for file_name in [
     './data/loan_baseline.pnml_noise_0.049999999999999996_iteration_1_seed_42477_sample.csv',
     './data/loan_baseline.pnml_noise_0.024999999999999998_iteration_1_seed_68964_sample.csv']:
 # file_name = './data/loan_baseline.pnml_noise_0.09999999999999999_iteration_1_seed_14329_sample.csv'
+    window_size = 50
+    retraining_size = 1
     
     
 
@@ -282,6 +282,8 @@ for file_name in [
     import pickle
     saving_file_name = file_name.split('/')[-1][:-4]
 
-
-    with open('./result/lof_cont%s_window%s_%s.pkl'%(contamination, window_size, saving_file_name), 'wb') as fp:
+    if retraining_size ==1:
+        retraining_size =0
+    with open('./result/lof_cont%s_window%s_retraining_%s_%s.pkl'%(contamination, window_size, retraining_size, saving_file_name), 'wb') as fp:
         pickle.dump(saving_data, fp)
+

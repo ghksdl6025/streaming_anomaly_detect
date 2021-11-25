@@ -23,8 +23,7 @@ with torch.no_grad():
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-window_size = 30
-retraining_size = 6
+
 
 for file_name in [
     './data/loan_baseline.pnml_noise_0.15_iteration_1_seed_614_sample.csv',
@@ -33,6 +32,10 @@ for file_name in [
     './data/loan_baseline.pnml_noise_0.075_iteration_1_seed_73753_sample.csv',
     './data/loan_baseline.pnml_noise_0.049999999999999996_iteration_1_seed_42477_sample.csv',
     './data/loan_baseline.pnml_noise_0.024999999999999998_iteration_1_seed_68964_sample.csv']:
+
+    window_size = 50
+    retraining_size = 25
+
 
     dataset = stream.iter_csv(
                 file_name
@@ -337,7 +340,7 @@ for file_name in [
 
     counting_normal = 0
 
-    for threshold in [0.01,0.05,0.1,0.15,0.2,0.25]:
+    for threshold in [0.01]:
         global_true =[]
         global_pred = []
 
@@ -393,5 +396,10 @@ for file_name in [
         import pickle
         saving_file_name = file_name.split('/')[-1][:-4]
 
-        with open('./result/lstm_thr%s_window%s_%s.pkl'%(threshold, window_size, saving_file_name), 'wb') as fp:
+
+
+        if retraining_size ==1:
+            retraining_size =0
+
+        with open('./result/lstm_thr%s_window%s_retraining_%s_%s.pkl'%(threshold, window_size, retraining_size, saving_file_name), 'wb') as fp:
             pickle.dump(saving_data, fp)
