@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?><process version="7.6.001">
+  <context>
+    <input/>
+    <output/>
+    <macros/>
+  </context>
+  <operator activated="true" class="process" compatibility="7.6.001" expanded="true" name="Process">
+    <parameter key="logverbosity" value="init"/>
+    <parameter key="random_seed" value="2001"/>
+    <parameter key="send_mail" value="never"/>
+    <parameter key="notification_email" value=""/>
+    <parameter key="process_duration_for_mail" value="30"/>
+    <parameter key="encoding" value="SYSTEM"/>
+    <process expanded="true">
+      <operator activated="true" class="concurrency:loop_files" compatibility="7.6.001" expanded="true" height="68" name="Loop Files" width="90" x="179" y="34">
+        <parameter key="directory" value="E:\svn\private\papers\2017_online_filtering\experiments\synthetic\loan_application\models\pnml"/>
+        <parameter key="filter_type" value="regex"/>
+        <parameter key="filter_by_regex" value=".*\.pnml"/>
+        <parameter key="recursive" value="false"/>
+        <parameter key="enable_macros" value="true"/>
+        <parameter key="macro_for_file_name" value="file_name"/>
+        <parameter key="macro_for_file_type" value="file_type"/>
+        <parameter key="macro_for_folder_name" value="folder_name"/>
+        <parameter key="reuse_results" value="false"/>
+        <parameter key="enable_parallel_execution" value="true"/>
+        <process expanded="true">
+          <operator activated="true" class="rapidprom:extract_petrinet_from_file" compatibility="4.0.002" expanded="true" height="68" name="Extract Petri Net" width="90" x="112" y="34"/>
+          <operator activated="true" class="loop_parameters" compatibility="7.6.001" expanded="true" height="82" name="loop_noise_levels" width="90" x="246" y="34">
+            <list key="parameters">
+              <parameter key="generate_spurious_events.insertion_probability" value="[0;0.25;10;linear]"/>
+            </list>
+            <parameter key="error_handling" value="fail on error"/>
+            <parameter key="synchronize" value="false"/>
+            <process expanded="true">
+              <operator activated="true" class="concurrency:loop" compatibility="7.6.001" expanded="true" height="82" name="Loop" width="90" x="45" y="34">
+                <parameter key="number_of_iterations" value="10"/>
+                <parameter key="iteration_macro" value="iteration"/>
+                <parameter key="reuse_results" value="false"/>
+                <parameter key="enable_parallel_execution" value="false"/>
+                <process expanded="true">
+                  <operator activated="true" class="generate_macro" compatibility="7.6.001" expanded="true" height="82" name="generate_macros" width="90" x="45" y="34">
+                    <list key="function_descriptions">
+                      <parameter key="log_generator_seed" value="round(rand() * 100000)"/>
+                      <parameter key="noise" value="param(&quot;generate_spurious_events&quot;, &quot;insertion_probability&quot;)"/>
+                    </list>
+                  </operator>
+                  <operator activated="true" class="multiply" compatibility="7.6.001" expanded="true" height="124" name="Multiply" width="90" x="179" y="34"/>
+                  <operator activated="true" class="rapidprom:generate_log_from_petrinet" compatibility="4.0.002" expanded="true" height="68" name="generate_log" width="90" x="179" y="187">
+                    <parameter key="number of traces" value="5000"/>
+                    <parameter key="max activities per trace" value="10000000"/>
+                    <parameter key="start time" value="2017.09.15 14:46:25 +0200"/>
+                    <parameter key="index of first trace" value="0"/>
+                    <parameter key="TBA (time between trace arrivals)" value="Exponential"/>
+                    <parameter key="TBA mean" value="1.0"/>
+                    <parameter key="TBA std dev" value="1.0"/>
+                    <parameter key="TBA min" value="1.0"/>
+                    <parameter key="TBA max" value="10.0"/>
+                    <parameter key="TBA time units" value="days"/>
+                    <parameter key="TBE (time between events)" value="Exponential"/>
+                    <parameter key="TBE mean" value="1.0"/>
+                    <parameter key="TBE std dev" value="1.0"/>
+                    <parameter key="TBE min" value="1.0"/>
+                    <parameter key="TBE max" value="10.0"/>
+                    <parameter key="TBE time units" value="Hours"/>
+                    <parameter key="seed" value="%{log_generator_seed}"/>
+                  </operator>
+                  <operator activated="true" class="multiply" compatibility="7.6.001" expanded="true" height="103" name="Multiply (2)" width="90" x="313" y="34"/>
+                  <operator activated="true" class="rapidprom:replay_a_log_on_petri_net_for_conformance_analysis" compatibility="4.0.002" expanded="true" height="124" name="Conformance Checking" width="90" x="447" y="289">
+                    <parameter key="event_classifier" value="Event Name"/>
+                    <parameter key="Max Explored States (in Thousands)" value="10000"/>
+                    <parameter key="Timeout (sec)" value="200"/>
+                    <parameter key="Number of Threads" value="8"/>
+                    <parameter key="Use ILP for heuristic" value="true"/>
+                    <parameter key="Restrict to integers" value="true"/>
+                    <parameter key="Use result of previous ILP as an estimator for the heuristic" value="true"/>
+                    <parameter key="Heuristic Function" value="PLAIN"/>
+                    <parameter key="Epsilon" value="0.0"/>
+                    <parameter key="Queueing Model" value="DEPTHFIRST"/>
+                    <parameter key="Non-synchronous move sorting" value="NONE"/>
+                  </operator>
+                  <operator activated="true" class="rapidprom:generate_spurious_events" compatibility="4.0.002" expanded="true" height="103" name="generate_spurious_events" width="90" x="715" y="187">
+                    <parameter key="event_classifier" value="Event Name"/>
+                    <parameter key="insertion_probability" value="0.1"/>
+                    <parameter key="percentage_of_labels" value="100"/>
+                    <parameter key="noise_label" value="noise"/>
+                    <parameter key="seed" value="false"/>
+                    <parameter key="seed_value" value="1337"/>
+                  </operator>
+                  <operator activated="true" class="rapidprom:export_log" compatibility="4.0.002" expanded="true" height="68" name="Export Event Log" width="90" x="849" y="187">
+                    <parameter key="folder" value="E:\svn\private\papers\2017_online_filtering\experiments\synthetic\loan_application\logs"/>
+                    <parameter key="file_name" value="%{file_name}_noise_%{noise}_iteration_%{iteration}_seed_%{log_generator_seed}"/>
+                    <parameter key="file_format" value="xes.gz"/>
+                  </operator>
+                  <connect from_port="input 1" to_op="generate_macros" to_port="through 1"/>
+                  <connect from_op="generate_macros" from_port="through 1" to_op="Multiply" to_port="input"/>
+                  <connect from_op="Multiply" from_port="output 1" to_op="generate_log" to_port="petri net"/>
+                  <connect from_op="Multiply" from_port="output 2" to_op="Conformance Checking" to_port="model (ProM Petri Net)"/>
+                  <connect from_op="Multiply" from_port="output 3" to_op="generate_spurious_events" to_port="model"/>
+                  <connect from_op="generate_log" from_port="event log" to_op="Multiply (2)" to_port="input"/>
+                  <connect from_op="Multiply (2)" from_port="output 1" to_op="Conformance Checking" to_port="event log (ProM Event Log)"/>
+                  <connect from_op="Multiply (2)" from_port="output 2" to_op="generate_spurious_events" to_port="event log (ProM Event Log)"/>
+                  <connect from_op="Conformance Checking" from_port="alignments (ProM PNRepResult)" to_op="generate_spurious_events" to_port="alignments"/>
+                  <connect from_op="generate_spurious_events" from_port="noisy_log" to_op="Export Event Log" to_port="input"/>
+                  <portSpacing port="source_input 1" spacing="0"/>
+                  <portSpacing port="source_input 2" spacing="0"/>
+                  <portSpacing port="sink_output 1" spacing="0"/>
+                </process>
+              </operator>
+              <connect from_port="input 1" to_op="Loop" to_port="input 1"/>
+              <portSpacing port="source_input 1" spacing="0"/>
+              <portSpacing port="source_input 2" spacing="0"/>
+              <portSpacing port="sink_performance" spacing="0"/>
+              <portSpacing port="sink_result 1" spacing="0"/>
+            </process>
+          </operator>
+          <connect from_port="file object" to_op="Extract Petri Net" to_port="file"/>
+          <connect from_op="Extract Petri Net" from_port="output" to_op="loop_noise_levels" to_port="input 1"/>
+          <portSpacing port="source_file object" spacing="0"/>
+          <portSpacing port="source_input 1" spacing="0"/>
+          <portSpacing port="sink_output 1" spacing="0"/>
+        </process>
+      </operator>
+      <portSpacing port="source_input 1" spacing="0"/>
+      <portSpacing port="sink_result 1" spacing="0"/>
+    </process>
+  </operator>
+</process>
